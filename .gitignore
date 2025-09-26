@@ -1,0 +1,15 @@
+# .gitignore for AOL_Portal
+# Backend
+AOL_Portal/bin/
+AOL_Portal/obj/
+
+# Frontend
+ClientApp/node_modules/
+
+# Others
+.vscode/
+.env
+.DS_Store
+Thumbs.db 
+.vs/
+/AOL_Portal/AOL_Portal.csproj.user
