@@ -4,6 +4,7 @@ using AOL_Portal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AOL_Portal.Migrations
 {
     [DbContext(typeof(AOLContext))]
-    partial class AOLContextModelSnapshot : ModelSnapshot
+    [Migration("20250929151504_AddAspNetCustomerTable")]
+    partial class AddAspNetCustomerTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,64 +117,6 @@ namespace AOL_Portal.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("AOL_Portal.Data.AolCustomerCustomField", b =>
-                {
-                    b.Property<int>("CustomerFieldId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerFieldId"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnOrder(8);
-
-                    b.Property<string>("CustomerCustomFieldDescription")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnOrder(5);
-
-                    b.Property<string>("CustomerCustomFieldLabel")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(4);
-
-                    b.Property<string>("CustomerCustomFieldName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(2);
-
-                    b.Property<string>("CustomerCustomFieldStatus")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(7);
-
-                    b.Property<string>("CustomerCustomFieldType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(6);
-
-                    b.Property<string>("CustomerCustomType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(3);
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnOrder(9);
-
-                    b.HasKey("CustomerFieldId");
-
-                    b.ToTable("AolCustomerCustomFields");
-                });
-
             modelBuilder.Entity("AOL_Portal.Data.AolUserRole", b =>
                 {
                     b.Property<string>("Id")
@@ -231,30 +176,6 @@ namespace AOL_Portal.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AspNetCustomers");
-                });
-
-            modelBuilder.Entity("AOL_Portal.Data.CustomerType", b =>
-                {
-                    b.Property<int>("CustomerTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerTypeId"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CustomerTypeName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("CustomerTypeId");
-
-                    b.ToTable("CustomerTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -1,0 +1,112 @@
+<div class="flex min-w-0 flex-auto flex-col">
+    <!-- Main -->
+    <div class="flex-auto p-6 sm:p-10">
+        <!-- Priority Management Content -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Priority Management</h1>
+            <p class="text-gray-600 dark:text-gray-400">Manage priority levels and their configurations</p>
+        </div>
+        
+        <!-- Priority Form -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <form class="space-y-6">
+                <!-- Priority Name -->
+                <div>
+                    <label for="priorityName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Priority Name
+                    </label>
+                    <input
+                        type="text"
+                        id="priorityName"
+                        name="priorityName"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                        placeholder="Enter priority name"
+                    />
+                </div>
+
+                <!-- Priority Level -->
+                <div>
+                    <label for="priorityLevel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Priority Level
+                    </label>
+                    <select
+                        id="priorityLevel"
+                        name="priorityLevel"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    >
+                        <option value="">Select priority level</option>
+                        <option value="1">Level 1 - Critical</option>
+                        <option value="2">Level 2 - High</option>
+                        <option value="3">Level 3 - Medium</option>
+                        <option value="4">Level 4 - Low</option>
+                        <option value="5">Level 5 - Very Low</option>
+                    </select>
+                </div>
+
+                <!-- Priority Color -->
+                <div>
+                    <label for="priorityColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Priority Color
+                    </label>
+                    <select
+                        id="priorityColor"
+                        name="priorityColor"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    >
+                        <option value="">Select priority color</option>
+                        <option value="red">Red - Critical</option>
+                        <option value="orange">Orange - High</option>
+                        <option value="yellow">Yellow - Medium</option>
+                        <option value="green">Green - Low</option>
+                        <option value="blue">Blue - Very Low</option>
+                    </select>
+                </div>
+
+                <!-- Response Time -->
+                <div>
+                    <label for="responseTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Response Time (hours)
+                    </label>
+                    <input
+                        type="number"
+                        id="responseTime"
+                        name="responseTime"
+                        min="0"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                        placeholder="Enter response time in hours"
+                    />
+                </div>
+
+                <!-- Priority Description -->
+                <div>
+                    <label for="priorityDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Priority Description
+                    </label>
+                    <textarea
+                        id="priorityDescription"
+                        name="priorityDescription"
+                        rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                        placeholder="Enter priority description and guidelines"
+                    ></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button
+                        type="button"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        Save Priority
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

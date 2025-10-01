@@ -4,6 +4,7 @@ using AOL_Portal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AOL_Portal.Migrations
 {
     [DbContext(typeof(AOLContext))]
-    partial class AOLContextModelSnapshot : ModelSnapshot
+    [Migration("20250930151447_UpdateAolCustomerCustomField")]
+    partial class UpdateAolCustomerCustomField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,58 +119,49 @@ namespace AOL_Portal.Migrations
 
             modelBuilder.Entity("AOL_Portal.Data.AolCustomerCustomField", b =>
                 {
-                    b.Property<int>("CustomerFieldId")
+                    b.Property<int>("CustomerId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerFieldId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnOrder(8);
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("CustomerCustomFieldDescription")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnOrder(5);
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("CustomerCustomFieldLabel")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(4);
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CustomerCustomFieldName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(2);
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CustomerCustomFieldStatus")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(7);
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CustomerCustomFieldType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(6);
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CustomerCustomType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnOrder(3);
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnOrder(9);
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("CustomerFieldId");
+                    b.HasKey("CustomerId");
 
                     b.ToTable("AolCustomerCustomFields");
                 });

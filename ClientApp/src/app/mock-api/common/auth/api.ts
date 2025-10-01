@@ -115,9 +115,22 @@ export class AuthMockApi {
             .onPost('api/auth/unlock-session', 1500)
             .reply(({ request }) => {
                 // Sign in successful
+                // if (
+                //     request.body.email === 'hughes.brian@company.com' &&
+                //     request.body.password === 'admin'
+                // ) {
+                //     return [
+                //         200,
+                //         {
+                //             user: cloneDeep(this._user),
+                //             accessToken: this._generateJWTToken(),
+                //             tokenType: 'bearer',
+                //         },
+                //     ];
+                // }
                 if (
-                    request.body.email === 'hughes.brian@company.com' &&
-                    request.body.password === 'admin'
+                    request.body.email === 'newnam.main@rud.com' &&
+                    request.body.password === '123456'
                 ) {
                     return [
                         200,

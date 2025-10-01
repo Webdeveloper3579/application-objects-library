@@ -133,7 +133,6 @@ namespace AOL_Portal.Controllers
                         returnResult.Success = true;
                         var resetpwdToken = await _userManager.GeneratePasswordResetTokenAsync(userValidate);
 
-
                         userValidate.StatusId = 2;
                         var result = await _userManager.UpdateAsync(userValidate);
                         if (result.Succeeded)

@@ -4,6 +4,7 @@ using AOL_Portal.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AOL_Portal.Migrations
 {
     [DbContext(typeof(AOLContext))]
-    partial class AOLContextModelSnapshot : ModelSnapshot
+    [Migration("20250930152902_UpdateCustomerCustomFieldTable")]
+    partial class UpdateCustomerCustomFieldTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
