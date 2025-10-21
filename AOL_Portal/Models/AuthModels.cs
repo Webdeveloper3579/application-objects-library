@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace AOL_Portal.Models
 {
@@ -39,25 +40,70 @@ namespace AOL_Portal.Models
         public string Surname { get; set; }
     }
 
+    public class SignUpRequest
+    {
+        [Required]
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(100, MinimumLength = 8)]
+        [JsonPropertyName("password")]
+        public string Password { get; set; }
+
+        [JsonPropertyName("company")]
+        public string Company { get; set; }
+    }
+
     public class AuthResponse
     {
         public bool Success { get; set; }
         public string Token { get; set; }
+        
+        [JsonPropertyName("accessToken")]
+        public string AccessToken 
+        { 
+            get => Token; 
+            set => Token = value; 
+        }
+        
         public string RefreshToken { get; set; }
         public DateTime ExpiresAt { get; set; }
+        
+        [JsonPropertyName("user")]
         public UserInfo User { get; set; }
+        
         public string Message { get; set; }
     }
 
     public class UserInfo
     {
+        [JsonPropertyName("id")]
         public string Id { get; set; }
+        
+        [JsonPropertyName("email")]
         public string Email { get; set; }
+        
+        [JsonPropertyName("name")]
+        public string Name => $"{FirstName} {Surname}";
+        
         public string FirstName { get; set; }
         public string Surname { get; set; }
         public string FullName => $"{FirstName} {Surname}";
         public bool IsSiteAdmin { get; set; }
         public List<string> Roles { get; set; } = new List<string>();
+    }
+
+    public class SignInWithTokenRequest
+    {
+        [Required]
+        [JsonPropertyName("accessToken")]
+        public string AccessToken { get; set; }
     }
 
     public class RefreshTokenRequest

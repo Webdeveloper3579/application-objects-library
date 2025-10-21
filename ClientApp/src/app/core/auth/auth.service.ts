@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { AuthUtils } from 'app/core/auth/auth.utils';
-import { UserService } from 'app/core/user/user.service';
+import { UserService, User } from 'app/core/user/user.service';
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -57,6 +57,11 @@ export class AuthService {
         if (this._authenticated) {
             return throwError('User is already logged in.');
         }
+
+        console.log('=== AUTH SERVICE DEBUG ===');
+        console.log('Credentials being sent:', credentials);
+        console.log('Email:', credentials.email);
+        console.log('Password:', credentials.password);
 
         return this._httpClient.post('api/auth/sign-in', credentials).pipe(
             switchMap((response: any) => {
@@ -151,6 +156,32 @@ export class AuthService {
         password: string;
     }): Observable<any> {
         return this._httpClient.post('api/auth/unlock-session', credentials);
+    }
+
+    /**
+     * Get user role based on IsSiteAdmin field
+     */
+    getUserRole(): 'admin' | 'customer' {
+        const user = this._userService.user;
+        console.log('=== USER ROLE DEBUG ===');
+        console.log('User object:', user);
+        console.log('IsSiteAdmin value:', user?.IsSiteAdmin);
+        console.log('IsSiteAdmin type:', typeof user?.IsSiteAdmin);
+        
+        if (user && user.IsSiteAdmin === true) {
+            console.log('User role: admin');
+            return 'admin';
+        }
+        console.log('User role: customer');
+        return 'customer';
+    }
+
+    /**
+     * Get redirect URL based on user role
+     */
+    getRedirectUrl(): string {
+        const role = this.getUserRole();
+        return role === 'admin' ? '/admin' : '/customer';
     }
 
     /**

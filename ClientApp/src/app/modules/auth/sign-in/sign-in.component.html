@@ -50,11 +50,11 @@
             }
 
             <!-- Sign in form -->
-            <form class="mt-8" [formGroup]="signInForm" #signInNgForm="ngForm">
+            <form class="mt-8" [formGroup]="signInForm" #signInNgForm="ngForm" (ngSubmit)="$event.preventDefault()">
                 <!-- Email field -->
                 <mat-form-field class="w-full">
                     <mat-label>Email address</mat-label>
-                    <input id="email" matInput [formControlName]="'email'" />
+                    <input id="email" matInput [formControlName]="'email'"/>
                     @if (signInForm.get('email').hasError('required')) {
                         <mat-error> Email address is required </mat-error>
                     }
@@ -123,6 +123,7 @@
                 <button
                     class="fuse-mat-button-large mt-6 w-full"
                     mat-flat-button
+                    type="button"
                     [color]="'primary'"
                     [disabled]="signInForm.disabled"
                     (click)="signIn()"

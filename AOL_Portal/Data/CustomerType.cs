@@ -1,17 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AOL_Portal.Data
 {
+    [Table("CustomerType")]
     public class CustomerType
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("CustomerTypeId")]
         public int CustomerTypeId { get; set; }
         
         [Required]
         [MaxLength(100)]
-        public string CustomerTypeName { get; set; }
-        
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-        public DateTime? ModifiedDate { get; set; }
+        [Column("CustomerTypeName")]
+        public string CustomerTypeName { get; set; } = string.Empty;
     }
 }

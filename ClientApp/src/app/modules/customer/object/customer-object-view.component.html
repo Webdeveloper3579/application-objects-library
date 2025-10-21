@@ -1,0 +1,160 @@
+<div class="flex min-w-0 flex-auto flex-col">
+  <!-- Main -->
+  <div class="flex-auto p-6 sm:p-10">
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ object?.ObjectName || 'Loading...' }}</h1>
+          <p class="text-gray-600 dark:text-gray-400">Fill out the form fields below</p>
+        </div>
+        <button
+          type="button"
+          (click)="goBack()"
+          class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500"
+        >
+          <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex items-center justify-center h-64">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p class="text-gray-600 dark:text-gray-400">Loading form...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !loading" class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+      {{ successMessage }}
+    </div>
+
+    <!-- Form Content -->
+    <div *ngIf="!loading && !errorMessage" class="max-w-4xl mx-auto">
+      <form (ngSubmit)="saveFieldValues()" class="space-y-6">
+        <!-- Fields -->
+        <div *ngFor="let field of fields" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div class="space-y-4">
+            <!-- Field Label -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {{ field.FieldLabel }}
+                <span *ngIf="field.FieldDescription" class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                  ({{ field.FieldDescription }})
+                </span>
+              </label>
+            </div>
+
+            <!-- Text Input -->
+            <div *ngIf="field.FieldType.toLowerCase() === 'text'">
+              <input
+                type="text"
+                [value]="formData[field.Id] || ''"
+                (input)="onFieldValueChange(field.Id, $event.target.value)"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                [placeholder]="'Enter ' + field.FieldLabel.toLowerCase()"
+              />
+            </div>
+
+            <!-- Number Input -->
+            <div *ngIf="field.FieldType.toLowerCase() === 'number'">
+              <input
+                type="number"
+                [value]="formData[field.Id] || ''"
+                (input)="onFieldValueChange(field.Id, $event.target.value)"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                [placeholder]="'Enter ' + field.FieldLabel.toLowerCase()"
+              />
+            </div>
+
+            <!-- Email Input -->
+            <div *ngIf="field.FieldType.toLowerCase() === 'email'">
+              <input
+                type="email"
+                [value]="formData[field.Id] || ''"
+                (input)="onFieldValueChange(field.Id, $event.target.value)"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                [placeholder]="'Enter ' + field.FieldLabel.toLowerCase()"
+              />
+            </div>
+
+            <!-- Date Input -->
+            <div *ngIf="field.FieldType.toLowerCase() === 'date'">
+              <input
+                type="date"
+                [value]="formData[field.Id] || ''"
+                (input)="onFieldValueChange(field.Id, $event.target.value)"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+             <!-- Select Input -->
+             <div *ngIf="isSelectField(field)">
+               <select
+                 [ngModel]="formData[field.Id] !== undefined ? formData[field.Id] : ''"
+                 (ngModelChange)="onFieldValueChange(field.Id, $event)"
+                 [name]="'field_' + field.Id"
+                 class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+               >
+                 <option value="">Select {{ field.FieldLabel.toLowerCase() }}</option>
+                 <option *ngFor="let selectValue of fieldSelectValues[field.Id]" [value]="selectValue.Value">
+                   {{ selectValue.Value }}
+                 </option>
+               </select>
+             </div>
+
+            <!-- Textarea Input -->
+            <div *ngIf="field.FieldType.toLowerCase() === 'textarea'">
+              <textarea
+                [value]="formData[field.Id] || ''"
+                (input)="onFieldValueChange(field.Id, $event.target.value)"
+                rows="4"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                [placeholder]="'Enter ' + field.FieldLabel.toLowerCase()"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-end pt-6">
+          <button
+            type="submit"
+            [disabled]="saving"
+            class="px-6 py-3 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          >
+            <svg *ngIf="saving" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <svg *ngIf="!saving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>{{ saving ? 'Saving...' : 'Save Form' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- No Fields Message -->
+    <div *ngIf="!loading && !errorMessage && fields.length === 0" class="text-center py-12">
+      <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Fields Available</h3>
+      <p class="text-gray-600 dark:text-gray-400">This object doesn't have any fields to fill out.</p>
+    </div>
+  </div>
+</div>

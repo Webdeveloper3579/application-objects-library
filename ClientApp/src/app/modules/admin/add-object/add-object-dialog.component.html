@@ -1,0 +1,168 @@
+<!-- Add Object Dialog -->
+<div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" *ngIf="isOpen">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+    <div class="mt-3">
+      <!-- Dialog Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Add New Object</h3>
+        <button
+          (click)="closeDialog()"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Dialog Form -->
+      <form [formGroup]="objectForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Object Name -->
+        <div>
+          <label for="objectName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Object Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="objectName"
+            formControlName="objectName"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+            placeholder="Enter object name"
+          />
+          <div *ngIf="objectForm.get('objectName')?.invalid && objectForm.get('objectName')?.touched" class="text-red-500 text-xs mt-1">
+            Object name is required
+          </div>
+        </div>
+
+
+
+        <!-- Additional Fields Section -->
+        <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Additional Fields</h4>
+            <button
+              type="button"
+              (click)="addField()"
+              class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex items-center space-x-1"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <span>Add Field</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Fields -->
+          <div *ngFor="let fieldControl of additionalFieldsFormArray.controls; let i = index" [formGroup]="fieldControl" class="mb-4 p-4 border border-gray-200 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Field {{ i + 1 }}</span>
+              <button
+                type="button"
+                (click)="removeField(i)"
+                class="text-red-500 hover:text-red-700 dark:hover:text-red-300"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Field Name -->
+            <div class="mb-3">
+              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Field Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="name"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white text-sm"
+                placeholder="Enter field name"
+              />
+              <div *ngIf="fieldControl.get('name')?.invalid && fieldControl.get('name')?.touched" class="text-red-500 text-xs mt-1">
+                Field name is required
+              </div>
+            </div>
+
+            <!-- Field Label -->
+            <div class="mb-3">
+              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Field Label <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="label"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white text-sm"
+                placeholder="Enter field label"
+              />
+              <div *ngIf="fieldControl.get('label')?.invalid && fieldControl.get('label')?.touched" class="text-red-500 text-xs mt-1">
+                Field label is required
+              </div>
+            </div>
+
+            <!-- Field Description -->
+            <div class="mb-3">
+              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Field Description
+              </label>
+              <textarea
+                formControlName="description"
+                rows="2"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white text-sm resize-none"
+                placeholder="Enter field description"
+              ></textarea>
+            </div>
+
+            <!-- Field Type -->
+            <div class="mb-3">
+              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Field Type <span class="text-red-500">*</span>
+              </label>
+              <select
+                formControlName="type"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white text-sm"
+              >
+                <option value="">Select type</option>
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="email">Email</option>
+                <option value="date">Date</option>
+                <option value="select">Select</option>
+                <option value="textarea">Textarea</option>
+              </select>
+              <div *ngIf="fieldControl.get('type')?.invalid && fieldControl.get('type')?.touched" class="text-red-500 text-xs mt-1">
+                Field type is required
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div *ngIf="successMessage" class="p-3 bg-green-100 border border-green-400 text-green-700 rounded text-sm">
+          {{ successMessage }}
+        </div>
+        <div *ngIf="errorMessage" class="p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+          {{ errorMessage }}
+        </div>
+
+        <!-- Dialog Actions -->
+        <div class="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            (click)="closeDialog()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="objectForm.invalid || saving"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span *ngIf="!saving">Create Object</span>
+            <span *ngIf="saving">Creating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

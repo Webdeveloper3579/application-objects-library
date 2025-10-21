@@ -48,27 +48,28 @@ export class AuthMockApi {
         // -----------------------------------------------------------------------------------------------------
         // @ Sign in - POST
         // -----------------------------------------------------------------------------------------------------
-        this._fuseMockApiService
-            .onPost('api/auth/sign-in', 1500)
-            .reply(({ request }) => {
-                // Sign in successful
-                if (
-                    request.body.email === 'hughes.brian@company.com' &&
-                    request.body.password === 'admin'
-                ) {
-                    return [
-                        200,
-                        {
-                            user: cloneDeep(this._user),
-                            accessToken: this._generateJWTToken(),
-                            tokenType: 'bearer',
-                        },
-                    ];
-                }
+        // Commented out to use real backend API
+        // this._fuseMockApiService
+        //     .onPost('api/auth/sign-in', 1500)
+        //     .reply(({ request }) => {
+        //         // Sign in successful
+        //         if (
+        //             request.body.email === 'hughes.brian@company.com' &&
+        //             request.body.password === 'admin'
+        //         ) {
+        //             return [
+        //                 200,
+        //                 {
+        //                     user: cloneDeep(this._user),
+        //                     accessToken: this._generateJWTToken(),
+        //                     tokenType: 'bearer',
+        //                 },
+        //             ];
+        //         }
 
-                // Invalid credentials
-                return [404, false];
-            });
+        //         // Invalid credentials
+        //         return [404, false];
+        //     });
 
         // -----------------------------------------------------------------------------------------------------
         // @ Sign in using the access token - POST
@@ -103,10 +104,11 @@ export class AuthMockApi {
         // -----------------------------------------------------------------------------------------------------
         // @ Sign up - POST
         // -----------------------------------------------------------------------------------------------------
-        this._fuseMockApiService.onPost('api/auth/sign-up', 1500).reply(() =>
-            // Simply return true
-            [200, true]
-        );
+        // Commented out to use real backend API
+        // this._fuseMockApiService.onPost('api/auth/sign-up', 1500).reply(() =>
+        //     // Simply return true
+        //     [200, true]
+        // );
 
         // -----------------------------------------------------------------------------------------------------
         // @ Unlock session - POST
@@ -128,19 +130,6 @@ export class AuthMockApi {
                 //         },
                 //     ];
                 // }
-                if (
-                    request.body.email === 'newnam.main@rud.com' &&
-                    request.body.password === '123456'
-                ) {
-                    return [
-                        200,
-                        {
-                            user: cloneDeep(this._user),
-                            accessToken: this._generateJWTToken(),
-                            tokenType: 'bearer',
-                        },
-                    ];
-                }
 
                 // Invalid credentials
                 return [404, false];

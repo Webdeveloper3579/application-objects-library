@@ -1,0 +1,15 @@
+/* Custom navigation spacing adjustments */
+
+/* Add top padding to the vertical navigation content to prevent menu items from being stuck to the top */
+fuse-vertical-navigation {
+    .fuse-vertical-navigation-wrapper {
+        .fuse-vertical-navigation-content {
+            /* Add padding to the top of the navigation content */
+            padding-top: 24px;
+            
+            /* Add padding to the bottom for better scrolling experience */
+            padding-bottom: 24px;
+        }
+    }
+}
+

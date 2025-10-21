@@ -66,9 +66,9 @@ export class AuthSignUpComponent implements OnInit {
         // Create the form
         this.signUpForm = this._formBuilder.group({
             name: ['', Validators.required],
+            company: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             password: ['', Validators.required],
-            company: [''],
             agreements: ['', Validators.requiredTrue],
         });
     }
@@ -93,22 +93,42 @@ export class AuthSignUpComponent implements OnInit {
         this.showAlert = false;
 
         // Sign up
+        console.log('Signing up with data:', this.signUpForm.value);
         this._authService.signUp(this.signUpForm.value).subscribe(
             (response) => {
-                // Navigate to the confirmation required page
-                this._router.navigateByUrl('/confirmation-required');
+                console.log('Sign-up successful:', response);
+                // Navigate to the sign-in page
+                this._router.navigateByUrl('/sign-in');
             },
-            (response) => {
+            (error) => {
+                console.error('Sign-up error:', error);
+                console.error('Error details:', error.error);
+                console.error('Validation errors:', error.error?.errors);
                 // Re-enable the form
                 this.signUpForm.enable();
 
                 // Reset the form
                 this.signUpNgForm.resetForm();
 
+                // Get error message from validation errors or exception
+                let errorMessage = 'Something went wrong, please try again.';
+                if (error.error?.errors) {
+                    const errors = Object.values(error.error.errors).flat();
+                    errorMessage = errors.join(', ');
+                } else if (typeof error.error === 'string') {
+                    // If error is a string (like exception message)
+                    errorMessage = error.error;
+                } else if (error.error?.title) {
+                    // If error has a title (like validation problem details)
+                    errorMessage = error.error.title;
+                } else if (error.error?.message || error.error?.Message) {
+                    errorMessage = error.error.message || error.error.Message;
+                }
+
                 // Set the alert
                 this.alert = {
                     type: 'error',
-                    message: 'Something went wrong, please try again.',
+                    message: errorMessage,
                 };
 
                 // Show the alert

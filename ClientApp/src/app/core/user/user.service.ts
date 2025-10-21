@@ -1,7 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { User } from 'app/core/user/user.types';
 import { map, Observable, ReplaySubject, tap } from 'rxjs';
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+    status?: string;
+    IsSiteAdmin?: boolean;
+    FirstName?: string;
+    Surname?: string;
+    FullName?: string;
+    Roles?: string[];
+}
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -24,6 +36,12 @@ export class UserService {
 
     get user$(): Observable<User> {
         return this._user.asObservable();
+    }
+
+    get user(): User {
+        let currentUser: User | null = null;
+        this._user.subscribe(user => currentUser = user).unsubscribe();
+        return currentUser!;
     }
 
     // -----------------------------------------------------------------------------------------------------

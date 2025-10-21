@@ -4,6 +4,7 @@ import { MessagesService } from 'app/layout/common/messages/messages.service';
 import { NotificationsService } from 'app/layout/common/notifications/notifications.service';
 import { QuickChatService } from 'app/layout/common/quick-chat/quick-chat.service';
 import { ShortcutsService } from 'app/layout/common/shortcuts/shortcuts.service';
+import { UserService } from 'app/core/user/user.service';
 import { forkJoin } from 'rxjs';
 
 export const initialDataResolver = () => {
@@ -12,6 +13,7 @@ export const initialDataResolver = () => {
     const notificationsService = inject(NotificationsService);
     const quickChatService = inject(QuickChatService);
     const shortcutsService = inject(ShortcutsService);
+    const userService = inject(UserService);
 
     // Fork join multiple API endpoint calls to wait all of them to finish
     return forkJoin([
@@ -20,5 +22,6 @@ export const initialDataResolver = () => {
         notificationsService.getAll(),
         quickChatService.getChats(),
         shortcutsService.getAll(),
+        userService.get(), // Load user data to restore user state after refresh
     ]);
 };

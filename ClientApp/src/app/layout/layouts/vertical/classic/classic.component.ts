@@ -17,6 +17,7 @@ import { NotificationsComponent } from 'app/layout/common/notifications/notifica
 import { SearchComponent } from 'app/layout/common/search/search.component';
 import { ShortcutsComponent } from 'app/layout/common/shortcuts/shortcuts.component';
 import { UserComponent } from 'app/layout/common/user/user.component';
+import { AddObjectDialogComponent } from 'app/modules/admin/add-object/add-object-dialog.component';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -36,11 +37,17 @@ import { Subject, takeUntil } from 'rxjs';
         NotificationsComponent,
         UserComponent,
         RouterOutlet,
+        AddObjectDialogComponent,
     ],
 })
 export class ClassicLayoutComponent implements OnInit, OnDestroy {
     isScreenSmall: boolean;
-    navigation: Navigation;
+    navigation: Navigation = {
+        compact: [],
+        default: [],
+        futuristic: [],
+        horizontal: []
+    };
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -73,11 +80,11 @@ export class ClassicLayoutComponent implements OnInit, OnDestroy {
      * On init
      */
     ngOnInit(): void {
-        // Subscribe to navigation data
-        this._navigationService.navigation$
+        // Subscribe to navigation data based on current route
+        this._router.events
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((navigation: Navigation) => {
-                this.navigation = navigation;
+            .subscribe(() => {
+                this.loadNavigation();
             });
 
         // Subscribe to media changes
@@ -87,6 +94,34 @@ export class ClassicLayoutComponent implements OnInit, OnDestroy {
                 // Check if the screen is small
                 this.isScreenSmall = !matchingAliases.includes('md');
             });
+
+        // Listen for navigation refresh events
+        window.addEventListener('refreshNavigation', () => {
+            this.loadNavigation();
+        });
+
+        // Load initial navigation
+        this.loadNavigation();
+    }
+
+    private loadNavigation(): void {
+        const currentUrl = this._router.url;
+        
+        if (currentUrl.startsWith('/admin')) {
+            // Load admin navigation
+            this._navigationService.get()
+                .pipe(takeUntil(this._unsubscribeAll))
+                .subscribe((navigation: Navigation) => {
+                    this.navigation = navigation;
+                });
+        } else if (currentUrl.startsWith('/customer')) {
+            // Load customer navigation
+            this._navigationService.getCustomerNavigation()
+                .pipe(takeUntil(this._unsubscribeAll))
+                .subscribe((navigation: Navigation) => {
+                    this.navigation = navigation;
+                });
+        }
     }
 
     /**
@@ -96,6 +131,9 @@ export class ClassicLayoutComponent implements OnInit, OnDestroy {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
+
+        // Remove event listener
+        window.removeEventListener('refreshNavigation', this.loadNavigation);
     }
 
     // -----------------------------------------------------------------------------------------------------

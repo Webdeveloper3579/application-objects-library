@@ -3,21 +3,25 @@ import { initialDataResolver } from 'app/app.resolvers';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
+import { AdminComponent } from 'app/modules/admin/admin.component';
+import { CustomerComponent } from 'app/modules/customer/customer.component';
+import { AdminRedirectResolver } from 'app/modules/admin/admin-redirect.resolver';
+import { CustomerRedirectResolver } from 'app/modules/customer/customer-redirect.resolver';
 
 // @formatter:off
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const appRoutes: Route[] = [
 
-    // Redirect empty path to '/customer'
-    {path: '', pathMatch : 'full', redirectTo: 'customer'},
+    // Redirect empty path to '/admin' (will be handled by role-based routing)
+    {path: '', pathMatch : 'full', redirectTo: 'admin'},
 
-    // Redirect signed-in user to the '/customer'
+    // Redirect signed-in user - this will be handled by the sign-in component based on user role
     //
     // After the user signs in, the sign-in page will redirect the user to the 'signed-in-redirect'
-    // path. Below is another redirection for that path to redirect the user to the desired
-    // location. This is a small convenience to keep all main routes together here on this file.
-    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'customer'},
+    // path. The sign-in component will determine the correct destination based on user role.
+    // Note: This redirect is removed to allow the sign-in component to handle role-based routing.
+    // {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'admin/customer'},
 
     // Auth routes for guests
     {
@@ -29,7 +33,6 @@ export const appRoutes: Route[] = [
             layout: 'empty'
         },
         children: [
-            {path: 'confirmation-required', loadChildren: () => import('app/modules/auth/confirmation-required/confirmation-required.routes')},
             {path: 'forgot-password', loadChildren: () => import('app/modules/auth/forgot-password/forgot-password.routes')},
             {path: 'reset-password', loadChildren: () => import('app/modules/auth/reset-password/reset-password.routes')},
             {path: 'sign-in', loadChildren: () => import('app/modules/auth/sign-in/sign-in.routes')},
@@ -66,7 +69,7 @@ export const appRoutes: Route[] = [
 
     // Admin routes
     {
-        path: '',
+        path: 'admin',
         canActivate: [AuthGuard],
         canActivateChild: [AuthGuard],
         component: LayoutComponent,
@@ -74,12 +77,23 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            {path: 'customer', loadChildren: () => import('app/modules/admin/customer/customer.routes')},
-            {path: 'supplier', loadChildren: () => import('app/modules/admin/supplier/supplier.routes')},
-            {path: 'asset', loadChildren: () => import('app/modules/admin/asset/asset.routes')},
-            {path: 'workorder', loadChildren: () => import('app/modules/admin/workorder/workorder.routes')},
-            {path: 'priority', loadChildren: () => import('app/modules/admin/priority/priority.routes')},
-            {path: 'servicegroup', loadChildren: () => import('app/modules/admin/servicegroup/servicegroup.routes')},
+            {path: '', component: AdminComponent, resolve: { objects: AdminRedirectResolver }},
+            {path: 'object', loadChildren: () => import('app/modules/admin/object/object.routes')},
         ]
-    }
+    },
+
+       // Customer routes (for regular users)
+       {
+           path: 'customer',
+           canActivate: [AuthGuard],
+           canActivateChild: [AuthGuard],
+           component: LayoutComponent,
+           resolve: {
+               initialData: initialDataResolver
+           },
+           children: [
+               {path: '', component: CustomerComponent, resolve: { objects: CustomerRedirectResolver }},
+               {path: 'object', loadChildren: () => import('app/modules/customer/object/customer-object-view.routes')},
+           ]
+       }
 ];

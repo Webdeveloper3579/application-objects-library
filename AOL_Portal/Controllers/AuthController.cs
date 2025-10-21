@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -23,29 +24,47 @@ namespace AOL_Portal.Controllers
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
         private readonly ApplicationConfigService _applicationConfigService;
+        private readonly AOLContext _context;
+        
         public AuthController(
             UserManager<AolApplicationUser> userManager,
             SignInManager<AolApplicationUser> signInManager,
             RoleManager<AolUserRole> roleManager,
             IEmailService emailService,
-             ApplicationConfigService applicationConfigService,
-            IJwtService jwtService)
+            ApplicationConfigService applicationConfigService,
+            IJwtService jwtService,
+            AOLContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _jwtService = jwtService;
-            _emailService =emailService;
+            _emailService = emailService;
             _applicationConfigService = applicationConfigService;
+            _context = context;
         }
 
-        [HttpPost("login")]
-        public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
+        /// <summary>
+        /// Simple test endpoint
+        /// </summary>
+        [HttpGet("test")]
+        public ActionResult Test()
         {
-          
+            return Ok(new { Message = "Backend is working!", Timestamp = DateTime.UtcNow });
+        }
+
+        [HttpPost("sign-in")]
+        public async Task<ActionResult<AuthResponse>> SignIn([FromBody] LoginRequest request)
+        {
+            Console.WriteLine($"=== SIGN-IN DEBUG START ===");
+            Console.WriteLine($"Email: '{request.Email}'");
+            Console.WriteLine($"Password: '{request.Password}'");
+            Console.WriteLine($"Email Length: {request.Email?.Length}");
+            Console.WriteLine($"Password Length: {request.Password?.Length}");
 
             if (!ModelState.IsValid)
             {
+                Console.WriteLine("ERROR: Invalid request data");
                 return BadRequest(new AuthResponse 
                 { 
                     Success = false, 
@@ -56,6 +75,7 @@ namespace AOL_Portal.Controllers
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
+                Console.WriteLine($"ERROR: User not found for email: {request.Email}");
                 return Unauthorized(new AuthResponse 
                 { 
                     Success = false, 
@@ -63,9 +83,15 @@ namespace AOL_Portal.Controllers
                 });
             }
 
+            Console.WriteLine($"User found: {user.Email}, StatusId: {user.StatusId}, EmailConfirmed: {user.EmailConfirmed}");
+
+            // Check password authentication
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+            Console.WriteLine($"Password check result: {result.Succeeded}");
+            
             if (!result.Succeeded)
             {
+                Console.WriteLine($"Authentication failed for user: {request.Email}");
                 return Unauthorized(new AuthResponse 
                 { 
                     Success = false, 
@@ -75,14 +101,16 @@ namespace AOL_Portal.Controllers
 
             if(user.StatusId==1)
             {
+                Console.WriteLine($"ERROR: Account email has not been validated (StatusId: {user.StatusId})");
                 return Unauthorized(new AuthResponse
                 {
                     Success = false,
                     Message = "Account email has not been validated"
                 });
             }
-            else if (user.StatusId != 2) // Assuming 1 is active status
+            else if (user.StatusId != 2) // Assuming 2 is active status
             {
+                Console.WriteLine($"ERROR: Account is not active (StatusId: {user.StatusId})");
                 return Unauthorized(new AuthResponse 
                 { 
                     Success = false, 
@@ -90,6 +118,7 @@ namespace AOL_Portal.Controllers
                 });
             }
 
+            Console.WriteLine($"Authentication successful! Generating tokens...");
             var authResponse = await _jwtService.GenerateTokenAsync(user);
             
             // Store the refresh token for this user
@@ -99,6 +128,7 @@ namespace AOL_Portal.Controllers
                 "RefreshToken",
                 authResponse.RefreshToken);
             
+            Console.WriteLine($"=== SIGN-IN DEBUG END - SUCCESS ===");
             return Ok(authResponse);
         }
 
@@ -301,6 +331,197 @@ namespace AOL_Portal.Controllers
                 Message = "User Created and Registration Email Send"
             });
 
+        }
+
+        /// <summary>
+        /// Public sign-up endpoint for new users
+        /// Creates a user account with email/password authentication
+        /// </summary>
+        [HttpPost("sign-up")]
+        public async Task<ActionResult<ValidateResult>> SignUp(SignUpRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ValidateResult
+                { 
+                    Success = false, 
+                    Message = "Invalid request" 
+                });
+            }
+
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                return BadRequest(new ValidateResult()
+                { 
+                    Success = false, 
+                    Message = "User with this email already exists" 
+                });
+            }
+
+            // Create the user
+            var user = new AolApplicationUser
+            {
+                UserName = request.Email,
+                Email = request.Email,
+                FirstName = request.Name,
+                Surname = request.Company ?? string.Empty,
+                CreatedDtm = DateTime.UtcNow,
+                LastUpdateDtm = DateTime.UtcNow,
+                LastUpdateUserId = "system",
+                StatusId = 2, // Active - no confirmation required
+                EmailConfirmed = true                
+            };
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new ValidateResult
+                { 
+                    Success = false, 
+                    Message = errors 
+                });
+            }
+
+            Console.WriteLine($"User created successfully: {user.Email}");
+            
+            // Create default customer records for the new user
+            try
+            {
+                await CreateDefaultCustomerRecords(user.Id);
+                Console.WriteLine($"Default customer records created for user: {user.Email}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to create default customer records: {ex.Message}");
+                // Don't fail the sign-up if customer records creation fails
+            }
+            
+            return Ok(new ValidateResult()
+            {
+                Success = true,
+                Message = "Account created successfully. You can now sign in."
+            });
+        }
+
+        /// <summary>
+        /// Creates default customer records for a new user with standard custom fields
+        /// </summary>
+        private async Task CreateDefaultCustomerRecords(string userId)
+        {
+            // Get all standard custom fields
+            var standardFields = await _context.AolCustomerCustomFields
+                .Where(cf => cf.CustomerCustomType == "Standard")
+                .ToListAsync();
+
+            if (!standardFields.Any())
+            {
+                Console.WriteLine("No standard custom fields found. Skipping customer record creation.");
+                return;
+            }
+
+            var customerRecords = new List<AspNetCustomer>();
+
+            foreach (var field in standardFields)
+            {
+                var customerRecord = new AspNetCustomer
+                {
+                    CustomerId = userId,
+                    CustomFieldId = field.CustomerFieldId,
+                    CustomFieldValue = GetDefaultValueForField(field.CustomerCustomFieldName),
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = null
+                };
+
+                customerRecords.Add(customerRecord);
+            }
+
+            _context.AspNetCustomers.AddRange(customerRecords);
+            await _context.SaveChangesAsync();
+        }
+
+        private string GetDefaultValueForField(string fieldName)
+        {
+            return fieldName.ToLower() switch
+            {
+                "customername" => "",
+                "customertype" => "",
+                "address" => "",
+                _ => ""
+            };
+        }
+
+        [HttpPost("sign-in-with-token")]
+        public async Task<ActionResult<AuthResponse>> SignInWithToken([FromBody] SignInWithTokenRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new AuthResponse 
+                { 
+                    Success = false, 
+                    Message = "Invalid request data" 
+                });
+            }
+
+            try
+            {
+                // Validate the JWT token
+                var principal = _jwtService.ValidateToken(request.AccessToken);
+                if (principal == null)
+                {
+                    return Unauthorized(new AuthResponse 
+                    { 
+                        Success = false, 
+                        Message = "Invalid token" 
+                    });
+                }
+
+                // Get user ID from token
+                var userId = principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(new AuthResponse 
+                    { 
+                        Success = false, 
+                        Message = "Invalid token" 
+                    });
+                }
+
+                // Get user from database
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized(new AuthResponse 
+                    { 
+                        Success = false, 
+                        Message = "User not found" 
+                    });
+                }
+
+                // Check if user is still active
+                if (user.StatusId != 2)
+                {
+                    return Unauthorized(new AuthResponse 
+                    { 
+                        Success = false, 
+                        Message = "User account is not active" 
+                    });
+                }
+
+                // Generate new tokens
+                var authResponse = await _jwtService.GenerateTokenAsync(user);
+                
+                return Ok(authResponse);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new AuthResponse 
+                { 
+                    Success = false, 
+                    Message = "Invalid token" 
+                });
+            }
         }
 
         [HttpPost("refresh")]

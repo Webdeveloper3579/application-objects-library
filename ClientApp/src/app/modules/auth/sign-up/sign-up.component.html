@@ -39,13 +39,26 @@
             }
 
             <!-- Sign Up form -->
-            <form class="mt-8" [formGroup]="signUpForm" #signUpNgForm="ngForm">
-                <!-- Name field -->
+            <form class="mt-8" [formGroup]="signUpForm" #signUpNgForm="ngForm" (ngSubmit)="$event.preventDefault()">
+                <!-- First name field -->
                 <mat-form-field class="w-full">
-                    <mat-label>Full name</mat-label>
+                    <mat-label>First name</mat-label>
                     <input id="name" matInput [formControlName]="'name'" />
                     @if (signUpForm.get('name').hasError('required')) {
-                        <mat-error> Full name is required </mat-error>
+                        <mat-error> First name is required </mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Surname field -->
+                <mat-form-field class="w-full">
+                    <mat-label>Surname</mat-label>
+                    <input
+                        id="surname"
+                        matInput
+                        [formControlName]="'company'"
+                    />
+                    @if (signUpForm.get('company').hasError('required')) {
+                        <mat-error> Surname is required </mat-error>
                     }
                 </mat-form-field>
 
@@ -99,16 +112,6 @@
                     <mat-error> Password is required </mat-error>
                 </mat-form-field>
 
-                <!-- Company field -->
-                <mat-form-field class="w-full">
-                    <mat-label>Company</mat-label>
-                    <input
-                        id="company-confirm"
-                        matInput
-                        [formControlName]="'company'"
-                    />
-                </mat-form-field>
-
                 <!-- ToS and PP -->
                 <div class="mt-1.5 inline-flex w-full items-end">
                     <mat-checkbox
@@ -135,6 +138,7 @@
                 <button
                     class="fuse-mat-button-large mt-6 w-full"
                     mat-flat-button
+                    type="button"
                     [color]="'primary'"
                     [disabled]="signUpForm.disabled"
                     (click)="signUp()"

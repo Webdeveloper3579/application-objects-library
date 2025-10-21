@@ -5,7 +5,7 @@
 <fuse-vertical-navigation
     [mode]="isScreenSmall ? 'over' : 'side'"
     [name]="'mainNavigation'"
-    [navigation]="navigation.default"
+    [navigation]="navigation?.default"
     [opened]="!isScreenSmall"
 >
     <!-- Navigation header hook -->
@@ -65,3 +65,6 @@
 
 <!-- Quick chat -->
 <!-- <quick-chat #quickChat="quickChat"></quick-chat> -->
+
+<!-- Add Object Dialog -->
+<add-object-dialog></add-object-dialog>

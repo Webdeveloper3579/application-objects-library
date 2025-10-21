@@ -67,10 +67,10 @@ export class AuthSignInComponent implements OnInit {
         // Create the form
         this.signInForm = this._formBuilder.group({
             email: [
-                'hughes.brian@company.com',
+                '',
                 [Validators.required, Validators.email],
             ],
-            password: ['admin', Validators.required],
+            password: ['', Validators.required],
             rememberMe: [''],
         });
     }
@@ -95,18 +95,18 @@ export class AuthSignInComponent implements OnInit {
         this.showAlert = false;
 
         // Sign in
+        console.log('=== FRONTEND SIGN-IN DEBUG ===');
+        console.log('Sign-in form data:', this.signInForm.value);
+        console.log('Email:', this.signInForm.value.email);
+        console.log('Password:', this.signInForm.value.password);
+        
         this._authService.signIn(this.signInForm.value).subscribe(
             () => {
-                // Set the redirect url.
-                // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
-                // to the correct page after a successful sign in. This way, that url can be set via
-                // routing file and we don't have to touch here.
-                const redirectURL =
-                    this._activatedRoute.snapshot.queryParamMap.get(
-                        'redirectURL'
-                    ) || '/signed-in-redirect';
+                // Get the redirect URL based on user role
+                const redirectURL = this._authService.getRedirectUrl();
+                console.log('User role-based redirect URL:', redirectURL);
 
-                // Navigate to the redirect url
+                // Navigate to the role-based redirect url
                 this._router.navigateByUrl(redirectURL);
             },
             (response) => {
